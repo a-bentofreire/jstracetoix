@@ -1,0 +1,155 @@
+// --------------------------------------------------------------------
+// Copyright (c) 2024 Alexandre Bento Freire. All rights reserved.
+// Licensed under the MIT license
+// --------------------------------------------------------------------
+"use strict";
+import { threadId } from "worker_threads";
+export const DEFAULT_FORMAT = {
+  result: "{name}:`{value}`",
+  input: "{name}:`{value}`",
+  thread: "{id}: ",
+  sep: " | ",
+  new_line: true
+};
+let _stream = true ? process.stdout : console.debug;
+let _multithreading = false;
+let _format = DEFAULT_FORMAT;
+let _inputsPerThreads = {};
+let _threadNames = {};
+let _sharedLockBuffer = true ? new SharedArrayBuffer(4) : void 0;
+let _lockArray = true ? new Int32Array(_sharedLockBuffer) : void 0;
+const acquireLock = () => {
+  if (_multithreading) {
+    while (Atomics.compareExchange(_lockArray, 0, 0, 1) !== 0) {
+    }
+  }
+};
+const releaseLock = () => {
+  if (_multithreading) {
+    Atomics.store(_lockArray, 0, 0);
+  }
+};
+const getThreadId = (threadIdParam = void 0) => {
+  return true ? threadIdParam || threadId : 0;
+};
+export const init__ = ({
+  stream = _stream,
+  multithreading = false,
+  format = DEFAULT_FORMAT
+} = {}) => {
+  acquireLock();
+  _stream = stream;
+  _multithreading = true ? multithreading : false;
+  _format = format;
+  _inputsPerThreads = {};
+  _threadNames = {};
+  releaseLock();
+};
+export const t__ = (name = void 0, threadIdParam = void 0) => {
+  acquireLock();
+  _threadNames[getThreadId(threadIdParam)] = name || `t${Object.keys(_threadNames).length}`;
+  releaseLock();
+};
+export const c__ = (value, params) => {
+  const { name = void 0, allow = void 0, level = 0 } = params || {};
+  acquireLock();
+  const _threadId = getThreadId();
+  if (!_inputsPerThreads[_threadId]) {
+    _inputsPerThreads[_threadId] = [{ index__: 0, meta__: ["meta__", "index__"] }];
+  }
+  while (_inputsPerThreads[_threadId].length <= level) {
+    _inputsPerThreads[_threadId].push({ index__: 0, meta__: ["meta__", "index__"] });
+  }
+  const inputs = _inputsPerThreads[_threadId][level];
+  const index = inputs.index__;
+  const metaCount = inputs.meta__.length;
+  let displayName = typeof name === "function" ? name(index, Object.keys(inputs).length - metaCount, value) : name || `i${Object.keys(inputs).length - metaCount}`;
+  let displayValue = value;
+  let allowResult = allow;
+  if (typeof allow === "function") {
+    allowResult = allow(index, displayName, value);
+    if (typeof allowResult !== "boolean") {
+      displayValue = allowResult;
+      allowResult = true;
+    }
+  }
+  if (allowResult === void 0 || allowResult) {
+    inputs[displayName] = displayValue;
+  }
+  inputs.index__ = index + 1;
+  releaseLock();
+  return value;
+};
+export const d__ = (value, params = {}) => {
+  let {
+    name = "_",
+    allow = void 0,
+    before = void 0,
+    after = void 0,
+    inputs = void 0,
+    format = void 0
+  } = params || {};
+  acquireLock();
+  const _threadId = getThreadId();
+  const threadInputs = _inputsPerThreads[_threadId] || [{}];
+  const data = { ...threadInputs[threadInputs.length - 1], ...inputs || {} };
+  data.thread_id__ = _threadId;
+  data.input_count__ = data.index__ || 0;
+  data.allow__ = true;
+  data.meta__ = [
+    ...data.meta__ || ["meta__"],
+    "allow__",
+    "allow_input_count__",
+    "input_count__",
+    "thread_id__",
+    name
+  ];
+  data[name] = value;
+  delete data.index__;
+  data.meta__ = data.meta__.filter((item) => item !== "index__");
+  data.allow_input_count__ = Object.keys(data).length - data.meta__.length + 1;
+  if (typeof allow === "function") {
+    allow = allow(data);
+    if (typeof allow !== "boolean") {
+      data[name] = allow;
+      allow = true;
+    }
+  }
+  if (allow !== false) {
+    format = format || _format;
+    let output = "";
+    if (_multithreading && format.thread) {
+      output += format.thread.replace("{id}", _threadNames[_threadId] || `${_threadId}`);
+    }
+    const replaceMacro = (_format2, _name, _value) => _format2.replace("{name}", _name).replace("{value}", typeof _value === "object" ? JSON.stringify(_value) : _value);
+    for (const key in data) {
+      if (!data.meta__.includes(key)) {
+        output += replaceMacro(format.input, key, data[key]) + format.sep;
+      }
+    }
+    if (format.result) {
+      output += replaceMacro(format.result, name, data[name]);
+    }
+    data.meta__ += ["output__"];
+    data.output__ = output;
+    if (before === void 0 || before(data)) {
+      output = data.output__ + (format.new_line ? "\n" : "");
+      if (true) {
+        _stream.write(output);
+      } else {
+        _stream(output);
+      }
+    }
+  } else {
+    data.allow__ = false;
+  }
+  after && after(data);
+  if (_inputsPerThreads[_threadId]) {
+    _inputsPerThreads[_threadId].pop();
+    if (_inputsPerThreads[_threadId].length === 0) {
+      delete _inputsPerThreads[_threadId];
+    }
+  }
+  releaseLock();
+  return value;
+};

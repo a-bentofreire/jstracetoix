@@ -1,0 +1,54 @@
+{
+    "name": "jstracetoix",
+    "description": "An expression tracer for debugging arrow functions, method chaining and expressions",
+    "version": "0.1.0",
+    "publisher": "a-bentofreire",
+    "type": "module",
+    "keywords": [
+        "debugging",
+        "logging",
+        "log",
+        "expression",
+        "arrow functions"
+    ],
+    "readme": "README.md",
+    "readmeFilename": "README.md",
+    "author": {
+        "name": "Alexandre Bento Freire",
+        "email": "devtoix@a-bentofreire.com",
+        "url": "https://github.com/a-bentofreire"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": "*"
+    },
+    "homepage": "https://www.devtoix.com/en/projects/jstracetoix/",
+    "bugs": "https://github.com/a-bentofreire/jstracetoix/issues",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/a-bentofreire/jstracetoix"
+    },
+    "main": "./node/jstracetoix.mjs",
+    "scripts": {
+        "lint": "npx eslint . --ignore-pattern '**/*.*js'",
+        "npm:publish": "npm publish",
+        "npm:publish-dry-run": "npm publish --dry-run",
+        "prepublishOnly": "npm run lint && npm run build-node && npm run build-node-dev && npm run build-browser && npm run build-browser-dev && npm run test && npm run build-docs",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js npx jest .",
+        "build-node-dev": "node build.js",
+        "build-node": "node build.js --production",
+        "build-browser-dev": "node build.js --browser",
+        "build-browser": "node build.js  --browser --production",
+        "build-docs": "typedoc --tsconfig tsconfig.json --out docs ./jstracetoix.ts"
+    },
+    "devDependencies": {
+        "@types/node": "^22.7.5",
+        "@typescript-eslint/eslint-plugin": "^8.8.1",
+        "@typescript-eslint/parser": "^8.8.1",
+        "esbuild": "^0.24.0",
+        "eslint": "^9.12.0",
+        "jest": "^29.7.0",
+        "typedoc": "^0.26.8",
+        "typescript": "^4.7.4"
+    }
+}

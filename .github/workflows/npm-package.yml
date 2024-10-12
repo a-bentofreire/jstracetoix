@@ -1,0 +1,42 @@
+name: Lint and Test
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npx eslint . --ignore-pattern '**/*.*js'
+
+      - name: Run Jest tests
+        run: node --experimental-vm-modules node_modules/jest/bin/jest.js
+
+      - name: Check for lint errors
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "ESLint found errors. Aborting the build."
+            exit 1
+          fi
+
+      - name: Check for test failures
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "Jest tests failed. Aborting the build."
+            exit 1
+          fi

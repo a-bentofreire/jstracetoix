@@ -1,0 +1,10 @@
+.private/
+node_modules/
+__tests__/
+docs/
+build.js
+*.ts
+.vscode/*
+*config*
+.gitignore
+.github
