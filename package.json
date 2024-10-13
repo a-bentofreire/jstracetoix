@@ -1,7 +1,7 @@
 {
     "name": "jstracetoix",
     "description": "An expression tracer for debugging arrow functions, method chaining and expressions",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "publisher": "a-bentofreire",
     "type": "module",
     "keywords": [
@@ -39,7 +39,9 @@
         "build-node": "node build.js --production",
         "build-browser-dev": "node build.js --browser",
         "build-browser": "node build.js  --browser --production",
-        "build-docs": "typedoc --tsconfig tsconfig.json --out docs ./jstracetoix.ts"
+        "build-docs": "typedoc --tsconfig tsconfig.json --out docs ./jstracetoix.ts",
+        "run-example-README": "node examples/example-README.js",
+        "run-example-multithreading-README": "node examples/example-multithreading-README.js"
     },
     "devDependencies": {
         "@types/node": "^22.7.5",

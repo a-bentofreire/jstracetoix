@@ -10,10 +10,14 @@ import { Writable } from 'stream';
  * Format Type -- Defines how result and input values will be formatted.
  *
  * @typedef {Object} Format
- * @property {string} result - The format of the result value to be displayed. Defaults to `'{name}: `{value}`'`.
- * @property {string} input - The format of the input value to be displayed. Defaults to `'{name}: `{value}`'`.
- * @property {string} thread - The format of the thread ID to be displayed. Defaults to `'{id}: '`.
- * @property {string} sep - The separator text between each input and the result. Defaults to `' | '`.
+ * @property {string} result - The format of the result value to be displayed.
+ *          Defaults to `'{name}: `{value}`'`.
+ * @property {string} input - The format of the input value to be displayed.
+ *          Defaults to `'{name}: `{value}`'`.
+ * @property {string} thread - The format of the thread ID to be displayed.
+ *          Defaults to `'{id}: '`.
+ * @property {string} sep - The separator text between each input and the result.
+ *          Defaults to `' | '`.
  * @property {boolean} new_line - If `true`, it will add a new line at the end of the output.
  */
 export type Format = {
@@ -24,10 +28,18 @@ export type Format = {
     new_line: boolean
 };
 
-type AllowResult = boolean | any;
-type AllowCallback = (data: Record<string, any>) => AllowResult;
-type EventCallback = (data: Record<string, any>) => boolean;
-type NodeBrowserStream = Writable | typeof console.debug;
+/**
+ * AllowResult -- If it's a boolean it will allow or disallow capture or display result.
+ *                Any other type, it will override the value being captured or displayed.
+*/
+export type AllowResult = boolean | any;
+export type AllowCallback = (data: Record<string, any>) => AllowResult;
+export type EventCallback = (data: Record<string, any>) => boolean;
+/**
+ * NodeBrowserStream -- "Writeable" stream for nodejs. Debug function for browser.
+ *                      Default "process.stdout" for nodejs. "console.debug" for browser.
+*/
+export type NodeBrowserStream = Writable | typeof console.debug;
 
 export const DEFAULT_FORMAT: Format = {
     result: '{name}:`{value}`',
@@ -66,10 +78,12 @@ const getThreadId = (threadIdParam: number | undefined = undefined) => {
  * Initializes global settings of the tracing tool.
  *
  * @param {Object} params - Parameters for initialization.
- * @param {NodeBrowserStream} [params.stream=process.stdout] - The output stream to write the output lines.
- *      Defaults to `process.stdout`.
- * @param {boolean} [params.multithreading=false] - If `true`, it prefixes the output with `thread_id:`.
- * @param {Format} [params.format=DEFAULT_FORMAT] - Format object defining the output format. Defaults to `DEFAULT_FORMAT`.
+ * @param {NodeBrowserStream} [params.stream=process.stdout] - The output stream to write
+ *       the output lines. Defaults to `process.stdout`.
+ * @param {boolean} [params.multithreading=false] - If `true`, it prefixes the output with
+ *       `thread_id:`.
+ * @param {Format} [params.format=DEFAULT_FORMAT] - Format object defining the output format.
+ *       Defaults to `DEFAULT_FORMAT`.
  */
 export const init__ = ({
     stream = _stream,
@@ -97,7 +111,8 @@ export const init__ = ({
  *
  * If no threadIdParam is provided, it uses the current thread ID.
  *
- * @param {string} [name] - The name for the thread. Defaults to 't%d' where %d is the number of threads.
+ * @param {string} [name] - The name for the thread.
+ *       Defaults to 't%d' where %d is the number of threads.
  * @param {number} [threadIdParam] - The ID of the thread. Defaults to the current thread ID.
  */
 export const t__ = (
@@ -118,15 +133,15 @@ export const t__ = (
  * @param {any} value The input value to store.
  * @param {Object} params Optional parameters object
  * @param {string | ((index: number, allowIndex: number, value: any) => string) } params.name The
- *                     name of the input.
- *                     Defaults to 'i%d' where %d is the number of inputs for the thread.
- * @param {boolean | ((index: number, name: string, value: any) => AllowResult} params.allow A function
- *                     or value to allow tracing the input. **allow** is called before **name**.
- *                     If it returns True or False, it will allow or disallow respectively.
- *                     If it returns not bool, then it will display the allow result instead of the input value.
- * @param {number} params.level The level number to be used when there is more than one **d__** within the same
- *                     expression or function.
- *                     Defaults to 0.
+ *       name of the input.
+ *       Defaults to 'i%d' where %d is the number of inputs for the thread.
+ * @param {boolean | ((index: number, name: string, value: any) => AllowResult} params.allow A
+ *       function or value to allow tracing the input. **allow** is called before **name**.
+ *       If it returns True or False, it will allow or disallow respectively.
+ *       If it returns not bool, then it will display the allow result instead of the input value.
+ * @param {number} params.level The level number to be used when there is more than one **d__**
+ *       within the same expression or function.
+ *       Defaults to 0.
  *
  * @returns The input value
  *
@@ -139,7 +154,8 @@ export const t__ = (
  * [1, 2, 3, 4, 5].map(i => c__(i, { allow: (index, name, value) => index > 2 }));
  * [10, 20, 30].map(x => c__(x, { allow: (index, name, value) => value === 20 }));
  *
- * const z = d__(() => c__(outside_1) + y * c__(outside_2) + d__(() => k * c__(inside(5), { level: 1 })));
+ * const z = d__(() => c__(outside_1) + y * c__(outside_2) + d__(() => k * c__(inside(5), 
+ *   { level: 1 })));
  */
 export const c__ = (
     value: any,
@@ -167,21 +183,22 @@ export const c__ = (
     let displayName = typeof name === 'function' ? name(index, Object.keys(inputs).length -
         metaCount, value) : name || `i${Object.keys(inputs).length - metaCount}`;
     let displayValue = value;
-
     let allowResult = allow;
-    if (typeof allow === 'function') {
-        allowResult = allow(index, displayName, value);
-        if (typeof allowResult !== 'boolean') {
-            displayValue = allowResult;
-            allowResult = true;
+    try {
+        if (typeof allow === 'function') {
+            allowResult = allow(index, displayName, value);
+            if (typeof allowResult !== 'boolean') {
+                displayValue = allowResult;
+                allowResult = true;
+            }
         }
+    } finally {
+        if (allowResult === undefined || allowResult) {
+            inputs[displayName] = displayValue;
+        }
+        inputs.index__ = index + 1;
+        releaseLock();
     }
-
-    if (allowResult === undefined || allowResult) {
-        inputs[displayName] = displayValue;
-    }
-    inputs.index__ = index + 1;
-    releaseLock();
     return value;
 };
 
@@ -269,58 +286,60 @@ export const d__ = (
     data.meta__ = data.meta__.filter((item: string) => item !== 'index__');
     data.allow_input_count__ = Object.keys(data).length - data.meta__.length + 1
 
-    if (typeof allow === 'function') {
-        allow = allow(data);
-        if (typeof allow !== 'boolean') {
-            data[name] = allow;
-            allow = true;
-        }
-    }
-
-    if (allow !== false) {
-        format = format || _format;
-        let output = '';
-
-        if (_multithreading && format.thread) {
-            output += format.thread.replace('{id}', _threadNames[_threadId] || `${_threadId}`);
-        }
-
-        const replaceMacro = (_format: string, _name: string, _value: any) =>
-            _format.replace('{name}', _name)
-                .replace('{value}', typeof _value === 'object' ? JSON.stringify(_value) : _value);
-
-        for (const key in data) {
-            if (!data.meta__.includes(key)) {
-                output += replaceMacro(format.input, key, data[key]) + format.sep;
+    try {
+        if (typeof allow === 'function') {
+            allow = allow(data);
+            if (typeof allow !== 'boolean') {
+                data[name] = allow;
+                allow = true;
             }
         }
 
-        if (format.result) {
-            output += replaceMacro(format.result, name, data[name]);
+        if (allow !== false) {
+            format = format || _format;
+            let output = '';
+
+            if (_multithreading && format.thread) {
+                output += format.thread.replace('{id}', _threadNames[_threadId] || `${_threadId}`);
+            }
+
+            const replaceMacro = (_format: string, _name: string, _value: any) =>
+                _format.replace('{name}', _name).replace('{value}',
+                    typeof _value === 'object' ? JSON.stringify(_value) : _value);
+
+            for (const key in data) {
+                if (!data.meta__.includes(key)) {
+                    output += replaceMacro(format.input, key, data[key]) + format.sep;
+                }
+            }
+
+            if (format.result) {
+                output += replaceMacro(format.result, name, data[name]);
+            }
+
+            data.meta__ += ['output__'];
+            data.output__ = output;
+            if (before === undefined || before(data)) {
+                output = data.output__ + (format.new_line ? '\n' : '');
+                if (IS_NODE) {
+                    (_stream as Writable).write(output);
+                } else {
+                    (_stream as typeof console.debug)(output);
+                }
+            }
+        } else {
+            data.allow__ = false;
         }
 
-        data.meta__ += ['output__'];
-        data.output__ = output;
-        if (before === undefined || before(data)) {
-            output = data.output__ + (format.new_line ? '\n' : '');
-            if (IS_NODE) {
-                (_stream as Writable).write(output);
-            } else {
-                (_stream as typeof console.debug)(output);
+        after && after(data);
+    } finally {
+        if (_inputsPerThreads[_threadId]) {
+            _inputsPerThreads[_threadId].pop();
+            if (_inputsPerThreads[_threadId].length === 0) {
+                delete _inputsPerThreads[_threadId];
             }
         }
-    } else {
-        data.allow__ = false;
+        releaseLock();
     }
-
-    after && after(data);
-
-    if (_inputsPerThreads[_threadId]) {
-        _inputsPerThreads[_threadId].pop();
-        if (_inputsPerThreads[_threadId].length === 0) {
-            delete _inputsPerThreads[_threadId];
-        }
-    }
-    releaseLock();
     return value;
 };

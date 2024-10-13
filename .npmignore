@@ -2,6 +2,7 @@
 node_modules/
 __tests__/
 docs/
+examples/
 build.js
 *.ts
 .vscode/*

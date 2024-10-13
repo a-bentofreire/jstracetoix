@@ -21,7 +21,8 @@ And 2 optional functions:
 
 If you find this project useful, please, read the [Support this Project](https://www.devtoix.com/en/projects/jstracetoix#support-this-project) on how to contribute.
 
-This package is also available for Python on pypi.org as [PyTraceToIX](https://www.devtoix.com/en/projects/pytracetoix).
+This package is also available for:
+- Python on pypi.org as [PyTraceToIX](https://www.devtoix.com/en/projects/pytracetoix).
 
 ## Features
 
@@ -50,7 +51,7 @@ npm install jstracetoix --save-dev
 <html lang="en">
 
 <head>
-    <script src="https://raw.githubusercontent.com/a-bentofreire/jstracetoix/refs/heads/master/browser/jstracetoix.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix/browser/jstracetoix.js?v=0.1.1"></script>
     <script>
         d__(c__(5) + 1);
     </script>

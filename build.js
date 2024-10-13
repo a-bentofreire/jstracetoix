@@ -11,12 +11,16 @@ async function build() {
     const isProduction = process.argv.includes('--production');
     const isBrowser = process.argv.includes('--browser');
     const suffix = isProduction ? '' : '-dev';
+    const rootPath = path.dirname(process.argv[1]);
+    const readFile = (filename) => fs.readFileSync(filename, 'utf8');
+    const version = JSON.parse(readFile(path.join(rootPath, 'package.json')))['version'];
 
     let params = {
         entryPoints: ['./jstracetoix.ts'],
         outfile: isBrowser ? `browser/jstracetoix${suffix}.js` : `node/jstracetoix${suffix}.mjs`,
         minify: isProduction,
         sourcemap: isProduction,
+        treeShaking: true,
         platform: isBrowser ? 'browser' : 'node',
         define: {
             'IS_NODE': isBrowser ? 'false' : 'true'
@@ -40,17 +44,24 @@ async function build() {
                 }
             }
         };
-        params.define['']
+        params.banner.js += `
+// Version: ${version}`;
     }
-
 
     try {
         await esbuild.build(params);
         console.log(`Build completed successfully${isProduction ? ' in production mode' : ''}.`);
         if (isBrowser) {
-            const filePath = path.join(path.dirname(process.argv[1]), 'browser', 'jstracetoix.js');
-            let content = fs.readFileSync(filePath, 'utf8');
-            fs.writeFileSync(filePath, content.replace(/var\s+\w+\s*=\s*\w+\("worker_threads"\);?/g, ''));
+            const jsFilePath = path.join(rootPath, 'browser', 'jstracetoix.js');
+            fs.writeFileSync(jsFilePath, readFile(jsFilePath)
+                .replace(/var\s+\w+\s*=\s*\w+\("worker_threads"\);?/g, ''));
+            if (isProduction) {
+                const readmePath = path.join(rootPath, 'README.md');
+                fs.writeFileSync(readmePath, readFile(readmePath).replace(/\?v=[\d\.]+/, `?v=${version}`));
+                if (readFile(path.join(rootPath, 'CHANGELOG.md')).split("\n")[0].indexOf(version) === -1) {
+                    throw new Error(`CHANGELOG.md doesn't ${version}`)
+                }
+            }
         }
     } catch (error) {
         console.error('Build failed:', error);

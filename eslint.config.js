@@ -22,6 +22,7 @@ export default [
         },
         rules: {
             'no-empty': 'off',
+            'max-len': ['error', { code: 100 }],
             'no-unused-vars':
                 [
                     'error',

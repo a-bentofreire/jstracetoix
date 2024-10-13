@@ -2,6 +2,7 @@
 // Copyright (c) 2024 Alexandre Bento Freire. All rights reserved.
 // Licensed under the MIT license
 // --------------------------------------------------------------------
+// Version: 0.1.1
 "use strict";
 var jstracetoix = (() => {
   var __defProp = Object.defineProperty;
@@ -114,18 +115,21 @@ var jstracetoix = (() => {
     let displayName = typeof name === "function" ? name(index, Object.keys(inputs).length - metaCount, value) : name || `i${Object.keys(inputs).length - metaCount}`;
     let displayValue = value;
     let allowResult = allow;
-    if (typeof allow === "function") {
-      allowResult = allow(index, displayName, value);
-      if (typeof allowResult !== "boolean") {
-        displayValue = allowResult;
-        allowResult = true;
+    try {
+      if (typeof allow === "function") {
+        allowResult = allow(index, displayName, value);
+        if (typeof allowResult !== "boolean") {
+          displayValue = allowResult;
+          allowResult = true;
+        }
       }
+    } finally {
+      if (allowResult === void 0 || allowResult) {
+        inputs[displayName] = displayValue;
+      }
+      inputs.index__ = index + 1;
+      releaseLock();
     }
-    if (allowResult === void 0 || allowResult) {
-      inputs[displayName] = displayValue;
-    }
-    inputs.index__ = index + 1;
-    releaseLock();
     return value;
   };
   var d__ = (value, params = {}) => {
@@ -156,49 +160,55 @@ var jstracetoix = (() => {
     delete data.index__;
     data.meta__ = data.meta__.filter((item) => item !== "index__");
     data.allow_input_count__ = Object.keys(data).length - data.meta__.length + 1;
-    if (typeof allow === "function") {
-      allow = allow(data);
-      if (typeof allow !== "boolean") {
-        data[name] = allow;
-        allow = true;
-      }
-    }
-    if (allow !== false) {
-      format = format || _format;
-      let output = "";
-      if (_multithreading && format.thread) {
-        output += format.thread.replace("{id}", _threadNames[_threadId] || `${_threadId}`);
-      }
-      const replaceMacro = (_format2, _name, _value) => _format2.replace("{name}", _name).replace("{value}", typeof _value === "object" ? JSON.stringify(_value) : _value);
-      for (const key in data) {
-        if (!data.meta__.includes(key)) {
-          output += replaceMacro(format.input, key, data[key]) + format.sep;
+    try {
+      if (typeof allow === "function") {
+        allow = allow(data);
+        if (typeof allow !== "boolean") {
+          data[name] = allow;
+          allow = true;
         }
       }
-      if (format.result) {
-        output += replaceMacro(format.result, name, data[name]);
+      if (allow !== false) {
+        format = format || _format;
+        let output = "";
+        if (_multithreading && format.thread) {
+          output += format.thread.replace("{id}", _threadNames[_threadId] || `${_threadId}`);
+        }
+        const replaceMacro = (_format2, _name, _value) => _format2.replace("{name}", _name).replace(
+          "{value}",
+          typeof _value === "object" ? JSON.stringify(_value) : _value
+        );
+        for (const key in data) {
+          if (!data.meta__.includes(key)) {
+            output += replaceMacro(format.input, key, data[key]) + format.sep;
+          }
+        }
+        if (format.result) {
+          output += replaceMacro(format.result, name, data[name]);
+        }
+        data.meta__ += ["output__"];
+        data.output__ = output;
+        if (before === void 0 || before(data)) {
+          output = data.output__ + (format.new_line ? "\n" : "");
+          if (false) {
+            _stream.write(output);
+          } else {
+            _stream(output);
+          }
+        }
+      } else {
+        data.allow__ = false;
       }
-      data.meta__ += ["output__"];
-      data.output__ = output;
-      if (before === void 0 || before(data)) {
-        output = data.output__ + (format.new_line ? "\n" : "");
-        if (false) {
-          _stream.write(output);
-        } else {
-          _stream(output);
+      after && after(data);
+    } finally {
+      if (_inputsPerThreads[_threadId]) {
+        _inputsPerThreads[_threadId].pop();
+        if (_inputsPerThreads[_threadId].length === 0) {
+          delete _inputsPerThreads[_threadId];
         }
       }
-    } else {
-      data.allow__ = false;
+      releaseLock();
     }
-    after && after(data);
-    if (_inputsPerThreads[_threadId]) {
-      _inputsPerThreads[_threadId].pop();
-      if (_inputsPerThreads[_threadId].length === 0) {
-        delete _inputsPerThreads[_threadId];
-      }
-    }
-    releaseLock();
     return value;
   };
   return __toCommonJS(jstracetoix_exports);
