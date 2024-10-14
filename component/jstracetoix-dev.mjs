@@ -5,30 +5,20 @@
 // Version: 0.1.3
 
 // externals.ts
-import { threadId } from "worker_threads";
-var _sharedLockBuffer = new SharedArrayBuffer(4);
-var _lockArray = new Int32Array(_sharedLockBuffer);
-var _multithreading = false;
-var _stream = process.stdout;
-var getMultithreading = () => _multithreading;
+var _stream = console.debug;
+var getMultithreading = () => false;
 var setMultithreading = (multithreading) => {
-  _multithreading = multithreading;
+};
+var getThreadId = (threadIdParam = void 0) => 0;
+var acquireLock = () => {
+};
+var releaseLock = () => {
+};
+var writeToStream = (output) => {
+  _stream(output);
 };
 var setStream = (stream) => {
   _stream = stream || _stream;
-};
-var writeToStream = (output) => {
-  _stream.write(output);
-};
-var getThreadId = (threadIdParam = void 0) => threadIdParam || threadId;
-var acquireLock = () => {
-  while (_multithreading && Atomics.compareExchange(_lockArray, 0, 0, 1) !== 0) {
-  }
-};
-var releaseLock = () => {
-  if (_multithreading) {
-    Atomics.store(_lockArray, 0, 0);
-  }
 };
 
 // jstracetoix.ts

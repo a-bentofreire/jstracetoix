@@ -1,0 +1,62 @@
+[
+  {
+    "product_id": 1,
+    "name": "Wireless Bluetooth Headphones",
+    "price": 79.99,
+    "description": "Noise-canceling wireless headphones with up to 30 hours of battery life and superior sound quality."
+  },
+  {
+    "product_id": 2,
+    "name": "Smartphone 128GB",
+    "price": 699.00,
+    "description": "Latest model smartphone with 6.5-inch OLED display, 5G connectivity, and a powerful processor."
+  },
+  {
+    "product_id": 3,
+    "name": "Stainless Steel Coffee Maker",
+    "price": 49.99,
+    "description": "12-cup programmable coffee maker with a sleek stainless steel design and brew-strength control."
+  },
+  {
+    "product_id": 4,
+    "name": "Electric Toothbrush",
+    "price": 39.95,
+    "description": "Rechargeable electric toothbrush with 3 brushing modes and a 2-minute timer for better oral care."
+  },
+  {
+    "product_id": 5,
+    "name": "4K Ultra HD TV",
+    "price": 999.99,
+    "description": "55-inch 4K Ultra HD Smart TV with HDR and built-in streaming apps for seamless entertainment."
+  },
+  {
+    "product_id": 6,
+    "name": "Gaming Laptop",
+    "price": 1299.00,
+    "description": "High-performance gaming laptop with 16GB RAM, 1TB SSD, and a powerful NVIDIA graphics card."
+  },
+  {
+    "product_id": 7,
+    "name": "Fitness Tracker Watch",
+    "price": 129.99,
+    "description": "Waterproof fitness tracker with heart rate monitoring, GPS, and 7-day battery life."
+  },
+  {
+    "product_id": 8,
+    "name": "Portable Bluetooth Speaker",
+    "price": 59.99,
+    "description": "Compact wireless speaker with deep bass, 10 hours of playtime, and a rugged waterproof design."
+  },
+  {
+    "product_id": 9,
+    "name": "Ergonomic Office Chair",
+    "price": 199.99,
+    "description": "Adjustable ergonomic chair with lumbar support, breathable mesh back, and comfortable cushioning."
+  },
+  {
+    "product_id": 10,
+    "name": "Electric Standing Desk",
+    "price": 399.00,
+    "description": "Adjustable height standing desk with electric motor and spacious work surface for a healthier workspace."
+  }
+]

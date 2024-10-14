@@ -7,7 +7,6 @@
         "skipLibCheck": true
     },
     "files": [
-        "./globals.d.ts",
         "./jstracetoix.ts"
     ]
 }

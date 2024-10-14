@@ -3,8 +3,10 @@
 // Licensed under the MIT license
 // --------------------------------------------------------------------
 
-import { threadId } from 'worker_threads';
-import { Writable } from 'stream';
+import {
+    NodeBrowserStream, getMultithreading, getThreadId, setMultithreading,
+    acquireLock, releaseLock, setStream, writeToStream
+} from './externals';
 
 /**
  * Format Type -- Defines how result and input values will be formatted.
@@ -35,11 +37,6 @@ export type Format = {
 export type AllowResult = boolean | any;
 export type AllowCallback = (data: Record<string, any>) => AllowResult;
 export type EventCallback = (data: Record<string, any>) => boolean;
-/**
- * NodeBrowserStream -- "Writeable" stream for nodejs. Debug function for browser.
- *                      Default "process.stdout" for nodejs. "console.debug" for browser.
-*/
-export type NodeBrowserStream = Writable | typeof console.debug;
 
 export const DEFAULT_FORMAT: Format = {
     result: '{name}:`{value}`',
@@ -49,44 +46,24 @@ export const DEFAULT_FORMAT: Format = {
     new_line: true
 };
 
-let _stream: NodeBrowserStream = IS_NODE ? process.stdout : console.debug;
-let _multithreading = false;
 let _format: Format = DEFAULT_FORMAT;
 let _inputsPerThreads: Record<number, Record<string, any>[]> = {};
 let _threadNames: Record<number, string> = {};
-
-let _sharedLockBuffer = IS_NODE ? new SharedArrayBuffer(4) : undefined;
-let _lockArray = IS_NODE ? new Int32Array(_sharedLockBuffer as SharedArrayBuffer) : undefined;
-
-const acquireLock = () => {
-    if (IS_NODE && _multithreading) {
-        while (Atomics.compareExchange(_lockArray as Int32Array, 0, 0, 1) !== 0) { }
-    }
-};
-
-const releaseLock = () => {
-    if (IS_NODE && _multithreading) {
-        Atomics.store(_lockArray as Int32Array, 0, 0);
-    }
-};
-
-const getThreadId = (threadIdParam: number | undefined = undefined) => {
-    return IS_NODE ? (threadIdParam || threadId) : 0;
-};
 
 /**
  * Initializes global settings of the tracing tool.
  *
  * @param {Object} params - Parameters for initialization.
  * @param {NodeBrowserStream} [params.stream=process.stdout] - The output stream to write
- *       the output lines. Defaults to `process.stdout`.
+ *       the output lines.
+ *       Default "process.stdout" for node or component and "console.debug" for browser.
  * @param {boolean} [params.multithreading=false] - If `true`, it prefixes the output with
  *       `thread_id:`.
  * @param {Format} [params.format=DEFAULT_FORMAT] - Format object defining the output format.
  *       Defaults to `DEFAULT_FORMAT`.
  */
 export const init__ = ({
-    stream = _stream,
+    stream = undefined,
     multithreading = false,
     format = DEFAULT_FORMAT
 }: {
@@ -96,8 +73,8 @@ export const init__ = ({
 } = {}): void => {
 
     acquireLock();
-    _stream = stream;
-    _multithreading = IS_NODE ? multithreading : false;
+    setStream(stream);
+    setMultithreading(multithreading);
     _format = format;
     _inputsPerThreads = {};
     _threadNames = {};
@@ -299,7 +276,7 @@ export const d__ = (
             format = format || _format;
             let output = '';
 
-            if (_multithreading && format.thread) {
+            if (getMultithreading() && format.thread) {
                 output += format.thread.replace('{id}', _threadNames[_threadId] || `${_threadId}`);
             }
 
@@ -322,12 +299,7 @@ export const d__ = (
             data.meta__ += ['output__'];
             data.output__ = output;
             if (before === undefined || before(data)) {
-                output = data.output__ + (format.new_line ? '\n' : '');
-                if (IS_NODE) {
-                    (_stream as Writable).write(output);
-                } else {
-                    (_stream as typeof console.debug)(output);
-                }
+                writeToStream(data.output__ + (format.new_line ? '\n' : ''));
             }
         } else {
             data.allow__ = false;

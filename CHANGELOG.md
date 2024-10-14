@@ -1,3 +1,7 @@
+## v0.1.3 - 2024-10-14
+- Improve build
+- Refactor to externalize platform dependencies.
+
 ## v0.1.2 - 2024-10-14
 - Fix issues with format
 - Add examples

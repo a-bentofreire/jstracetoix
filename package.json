@@ -1,15 +1,17 @@
 {
     "name": "jstracetoix",
-    "description": "An expression tracer for debugging arrow functions, method chaining and expressions",
-    "version": "0.1.2",
+    "description": "An expression tracer for debugging React components, arrow functions, method chaining and expressions",
+    "version": "0.1.3",
     "publisher": "a-bentofreire",
     "type": "module",
     "keywords": [
         "debugging",
         "logging",
+        "react",
         "log",
         "expression",
-        "arrow functions"
+        "arrow functions",
+        "tracer"
     ],
     "readme": "README.md",
     "readmeFilename": "README.md",
@@ -33,12 +35,9 @@
         "lint": "npx eslint . --ignore-pattern '**/*.*js'",
         "npm:publish": "npm publish",
         "npm:publish-dry-run": "npm publish --dry-run",
-        "prepublishOnly": "npm run lint --fix && npm run build-node && npm run build-node-dev && npm run build-browser && npm run build-browser-dev && npm run test && npm run build-docs",
-        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js npx jest .",
-        "build-node-dev": "node build.js",
-        "build-node": "node build.js --production",
-        "build-browser-dev": "node build.js --browser",
-        "build-browser": "node build.js  --browser --production",
+        "prepublishOnly": "npm run lint --fix && npm run build && npm run test && npm run build-docs",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js npx jest --rootDir __tests__ .",
+        "build": "node build.js",
         "build-docs": "typedoc --tsconfig tsconfig.json --out docs ./jstracetoix.ts",
         "run-example-README": "node examples/example-README.js",
         "run-example-multithreading-README": "node examples/example-multithreading-README.js"

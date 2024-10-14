@@ -5,16 +5,11 @@ import typescriptParser from '@typescript-eslint/parser';
 export default [
     eslint.configs.recommended,
     {
-        files: ['*.ts'],
+        files: ['jstracetoix.ts'],
         languageOptions: {
             parser: typescriptParser,
             parserOptions: {
                 project: './tsconfig.json',
-            },
-            globals: {
-                IS_NODE: 'readonly',
-                process: 'readonly',
-                console: 'readonly',
             },
         },
         plugins: {
@@ -28,8 +23,7 @@ export default [
                 [
                     'error',
                     {
-                        argsIgnorePattern: '(data|index|allowIndex|value|name)',
-                        varsIgnorePattern: 'IS_NODE',
+                        argsIgnorePattern: '(data|index|allowIndex|value|name)'
                     }
                 ]
         },

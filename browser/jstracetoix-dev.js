@@ -2,7 +2,7 @@
 // Copyright (c) 2024 Alexandre Bento Freire. All rights reserved.
 // Licensed under the MIT license
 // --------------------------------------------------------------------
-// Version: 0.1.2
+// Version: 0.1.3
 "use strict";
 var jstracetoix = (() => {
   var __defProp = Object.defineProperty;
@@ -23,12 +23,6 @@ var jstracetoix = (() => {
       }
     return a;
   };
-  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-  }) : x)(function(x) {
-    if (typeof require !== "undefined") return require.apply(this, arguments);
-    throw Error('Dynamic require of "' + x + '" is not supported');
-  });
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -52,7 +46,25 @@ var jstracetoix = (() => {
     init__: () => init__,
     t__: () => t__
   });
-  var import_worker_threads = __require("worker_threads");
+
+  // externals.ts
+  var _stream = console.debug;
+  var getMultithreading = () => false;
+  var setMultithreading = (multithreading) => {
+  };
+  var getThreadId = (threadIdParam = void 0) => 0;
+  var acquireLock = () => {
+  };
+  var releaseLock = () => {
+  };
+  var writeToStream = (output) => {
+    _stream(output);
+  };
+  var setStream = (stream) => {
+    _stream = stream || _stream;
+  };
+
+  // jstracetoix.ts
   var DEFAULT_FORMAT = {
     result: "{name}:`{value}`",
     input: "{name}:`{value}`",
@@ -60,35 +72,17 @@ var jstracetoix = (() => {
     sep: " | ",
     new_line: true
   };
-  var _stream = false ? process.stdout : console.debug;
-  var _multithreading = false;
   var _format = DEFAULT_FORMAT;
   var _inputsPerThreads = {};
   var _threadNames = {};
-  var _sharedLockBuffer = false ? new SharedArrayBuffer(4) : void 0;
-  var _lockArray = false ? new Int32Array(_sharedLockBuffer) : void 0;
-  var acquireLock = () => {
-    if (false) {
-      while (Atomics.compareExchange(_lockArray, 0, 0, 1) !== 0) {
-      }
-    }
-  };
-  var releaseLock = () => {
-    if (false) {
-      Atomics.store(_lockArray, 0, 0);
-    }
-  };
-  var getThreadId = (threadIdParam = void 0) => {
-    return false ? threadIdParam || threadId : 0;
-  };
   var init__ = ({
-    stream = _stream,
+    stream = void 0,
     multithreading = false,
     format = DEFAULT_FORMAT
   } = {}) => {
     acquireLock();
-    _stream = stream;
-    _multithreading = false ? multithreading : false;
+    setStream(stream);
+    setMultithreading(multithreading);
     _format = format;
     _inputsPerThreads = {};
     _threadNames = {};
@@ -171,7 +165,7 @@ var jstracetoix = (() => {
       if (allow !== false) {
         format = format || _format;
         let output = "";
-        if (_multithreading && format.thread) {
+        if (getMultithreading() && format.thread) {
           output += format.thread.replace("{id}", _threadNames[_threadId] || `${_threadId}`);
         }
         const replaceMacro = (_format2, _name, _value) => _format2.replace("{name}", _name).replace(
@@ -191,12 +185,7 @@ var jstracetoix = (() => {
         data.meta__ += ["output__"];
         data.output__ = output;
         if (before === void 0 || before(data)) {
-          output = data.output__ + (format.new_line ? "\n" : "");
-          if (false) {
-            _stream.write(output);
-          } else {
-            _stream(output);
-          }
+          writeToStream(data.output__ + (format.new_line ? "\n" : ""));
         }
       } else {
         data.allow__ = false;
@@ -215,4 +204,4 @@ var jstracetoix = (() => {
   };
   return __toCommonJS(jstracetoix_exports);
 })();
-for(key of Object.keys(jstracetoix).filter((key) => key.includes("__"))) { window[key]=jstracetoix[key]; }
+for(const key of Object.keys(jstracetoix).filter((key) => key.includes("__"))) { window[key]=jstracetoix[key]; }

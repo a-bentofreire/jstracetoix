@@ -3,9 +3,9 @@
 ![NPM Version](https://img.shields.io/npm/v/jstracetoix)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-bentofreire/jstracetoix/.github%2Fworkflows%2Fnpm-package.yml)
 
-[JsTraceToIX](https://www.devtoix.com/en/projects/jstracetoix) is an expression tracer for debugging arrow functions, method chaining, and expressions.
+[JsTraceToIX](https://www.devtoix.com/en/projects/jstracetoix) is an expression tracer for debugging React components, arrow functions, method chaining, and expressions.
 
-Code editors can't set breakpoints inside expressions, arrow functions, and chained methods, forcing significant code changes to debug such code.
+Code editors cannot set breakpoints within expressions, including React components, arrow functions, and chained methods, often requiring significant code changes to debug this type of code.
 
 JsTraceToIX provides a straightforward solution to this problem.
 
@@ -26,25 +26,84 @@ This package is also available for:
 
 ## Features
 
-- Runs on Node.js and in the browser.
-- [Multithreading](https://www.devtoix.com/en/projects/jstracetoix#multithreading) support.
-- Simple and short minimalist function names.
-- Result with Inputs tracing.
-- Configurable [formatting](https://www.devtoix.com/en/projects/jstracetoix#formatting) at global level and at function level.
+- No external dependencies.
+- Runs on Node.js, browsers, and React components.
+- Supports [Multithreading](https://www.devtoix.com/en/projects/jstracetoix#multithreading).
+- Minimalist function names that are simple and short.
+- Traces results along with inputs.
 - Configurable result and input naming.
-- Output to the stdout or a stream.
-- Multiple levels.
-- Capture Input method with `allow` and `name` callback.
-- Display Result method with `allow`, `before` and `after` callbacks.
-- Input and Result output can be formatted and overridden.
+- Outputs to console.debug (browsers and React) or a stream (Node.js).
+- Supports multiple levels.
+- Capture Input method with customizable `allow` and `name` callbacks.
+- Display Result method with customizable `allow`, `before`, and `after` callbacks.
+- Input and result outputs can be formatted and overridden.
+- Configurable [formatting](https://www.devtoix.com/en/projects/jstracetoix#formatting) at both global and function levels.
 
-## Installation - Node.js
+## How to install JsTraceToIX on Node.js or React
 
 ```bash
 npm install jstracetoix --save-dev
 ```
 
-## Running in the Browser
+## How to use JsTraceToIX on React
+
+JsTraceToIX can be used to debug expressions within React components.  
+It can be installed locally or imported via URL.  
+The output is displayed in the browser's developer tools under the console tab.  
+Since the output is generated using `console.debug`, it can easily be filtered out from regular `console.log` messages.
+
+```javascript
+// Without local installation
+import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix/component/jstracetoix.mjs?v=0.1.3';
+
+// If it's installed locally  via npm install jstracetoix --save-dev
+// import { c__, d__ } from 'jstracetoix/component/jstracetoix.mjs';
+
+                        // c__ captures the input price 
+const cityTax = (price) => c__(price, {name: 'Price'}) > 20 ? 15 : 5;
+const products = [
+    { title: 'Rice', price: 10, id: 1 },
+    { title: 'Coffee', price: 30, id: 2 },
+    { title: 'Shoes', price: 100, id: 3 },
+];
+
+function ShoppingList() {
+    // c__ captures the title and the output of the cityTax
+    // d__ displays the aggregated information in a single line: title, price, cityTax, total Price
+    const listItems = products.map(product =>
+        <tr key={product.id}>
+            <td>{c__(product.title)}</td>
+            <td>{d__(product.price + c__(cityTax(product.price), { name: 'CityTax' }))}</td>
+        </tr>
+    );
+
+    return (
+        <table><tbody>{listItems}</tbody></table>
+    );
+}
+
+function App() {
+    return (
+        <div className="App">
+            <header className="App-header">
+                <ShoppingList />
+            </header>
+        </div>
+    );
+}
+
+export default App;
+```
+
+`console.debug` output:
+
+```plaintext
+i0:`Rice` | Price:`10` | CityTax:`5` | _:`15`
+i0:`Coffee` | Price:`30` | CityTax:`15` | _:`45`
+i0:`Shoes` | Price:`100` | CityTax:`15` | _:`115`
+```
+
+## How to use JsTraceToIX on a browser
 
 ```html
 <!DOCTYPE html>
