@@ -2,7 +2,7 @@
 // Copyright (c) 2024 Alexandre Bento Freire. All rights reserved.
 // Licensed under the MIT license
 // --------------------------------------------------------------------
-// Version: 0.1.1
+// Version: 0.1.2
 "use strict";
 var jstracetoix = (() => {
   var __defProp = Object.defineProperty;
@@ -178,9 +178,11 @@ var jstracetoix = (() => {
           "{value}",
           typeof _value === "object" ? JSON.stringify(_value) : _value
         );
-        for (const key in data) {
-          if (!data.meta__.includes(key)) {
-            output += replaceMacro(format.input, key, data[key]) + format.sep;
+        if (format.input) {
+          for (const key in data) {
+            if (!data.meta__.includes(key)) {
+              output += replaceMacro(format.input, key, data[key]) + (format.sep || "");
+            }
           }
         }
         if (format.result) {

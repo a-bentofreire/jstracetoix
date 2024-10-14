@@ -23,6 +23,7 @@ export default [
         rules: {
             'no-empty': 'off',
             'max-len': ['error', { code: 100 }],
+            'no-trailing-spaces': ['error'],
             'no-unused-vars':
                 [
                     'error',

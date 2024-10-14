@@ -1,4 +1,5 @@
 import { c__, d__, init__, t__ } from '../node/jstracetoix.mjs';
+import { threadId } from 'worker_threads';
 
 describe('TestSingleThread', () => {
     function callEqual(data, expected) {
@@ -71,7 +72,7 @@ describe('TestSingleThread', () => {
 
     test('capture_allow_index', () => {
         d__(
-            [...Array(6).keys()].map(i =>
+            [0, 1, 2, 3, 4, 5].map(i =>
                 c__(i, {
                     allow: (index) => index === 1 || index === 4
                 })
@@ -84,7 +85,7 @@ describe('TestSingleThread', () => {
 
     test('capture_allow_name', () => {
         d__(
-            [...Array(6).keys()].map(i =>
+            [0, 1, 2, 3, 4, 5].map(i =>
                 c__(i, {
                     allow: (_, name) => name[1] === '0' || name[1] === '1' || name[1] === '2'
                 })
@@ -115,20 +116,129 @@ describe('TestSingleThread', () => {
     });
 
     test('test_capture_allow_index_with_name_index', () => {
-        d__([...Array(6).keys()].map(i =>
+        d__([0, 1, 2, 3, 4, 5].map(i =>
             c__(i, { allow: (index, _, __) => index === 1 || index === 4, name: (index, _, __) => `x${index + 1}` })),
             { before: (data) => callEqual(data, "x2:`1` | x5:`4` | _:`[0,1,2,3,4,5]`") });
     });
 
     test('test_capture_allow_index_with_name_allow_index', () => {
-        d__([...Array(6).keys()].map(i =>
+        d__([0, 1, 2, 3, 4, 5].map(i =>
             c__(i, { allow: (index, _, __) => index === 1 || index === 4, name: (_, allow_index, __) => `y${allow_index}` })),
             { before: (data) => callEqual(data, "y0:`1` | y1:`4` | _:`[0,1,2,3,4,5]`") });
     });
 
     test('test_capture_allow_index_with_name_allow_value', () => {
-        d__([...Array(6).keys()].map(i =>
+        d__([0, 1, 2, 3, 4, 5].map(i =>
             c__(i, { allow: (index, _, __) => index === 1 || index === 4, name: (_, __, value) => `z${value}` })),
             { before: (data) => callEqual(data, "z1:`1` | z4:`4` | _:`[0,1,2,3,4,5]`") });
     });
+
+    test('test_display_allow_allow_input_count__', () => {
+        d__([0, 1, 2, 3, 4].map(i =>
+            c__(i, { allow: (index, _, __) => index > 1 && index < 4 })),
+            {
+                allow: (data) => data['allow_input_count__'] === 2,
+                before: (data) => callEqual(data, "i0:`2` | i1:`3` | _:`[0,1,2,3,4]`")
+            });
+
+        d__([0, 1, 2, 3, 4].map(i =>
+            c__(i, { allow: (index, _, __) => index > 1 && index < 4 })),
+            {
+                allow: (data) => data['allow_input_count__'] !== 2,
+                after: (data) => data['output__'] === undefined
+            });
+    });
+
+    test('test_display_allow_input_count__', () => {
+        d__([0, 1, 2, 3, 4].map(i =>
+            c__(i, { allow: (index, _, __) => index > 1 && index < 4 })),
+            {
+                allow: (data) => data['input_count__'] === 5,
+                before: (data) => callEqual(data, "i0:`2` | i1:`3` | _:`[0,1,2,3,4]`")
+            });
+
+        d__([0, 1, 2, 3, 4].map(i =>
+            c__(i, { allow: (index, _, __) => index > 1 && index < 4 })),
+            {
+                allow: (data) => data['input_count__'] !== 5,
+                after: (data) => data['output__'] === undefined
+            });
+    });
+
+    test('test_display_allow_thread_id__', () => {
+        d__([0, 1].map(i =>
+            c__(i)),
+            {
+                allow: (data) => data['thread_id__'] === threadId,
+                before: (data) => callEqual(data, "i0:`0` | i1:`1` | _:`[0,1]`")
+            });
+
+        d__([0, 1].map(i =>
+            c__(i)),
+            {
+                allow: (data) => data['thread_id__'] !== threadId,
+                after: (data) => data['output__'] === undefined
+            });
+    });
+
+    test('test_display_allow_override', () => {
+        d__([['10', '20'], ['30', '40'], ['50', '60']].map(i =>
+            c__(i)),
+            {
+                allow: (data) => data['_'].slice(0, 2),
+                before: (data) => callEqual(data, 'i0:`["10","20"]` | i1:`["30","40"]` | i2:`["50","60"]` | _:`[["10","20"],["30","40"]]`')
+            });
+    });
+
+    test('test_display_after', () => {
+        d__([0, 1].map(i =>
+            c__(i)),
+            {
+                before: (_) => false,
+                after: (data) => callEqual(data, "i0:`0` | i1:`1` | _:`[0,1]`")
+            });
+    });
+
+    test('test_display_format', () => {
+        d__([0, 1].map(i =>
+            c__(i + 1)),
+            {
+                format: { input: 'k{name}:`z{value}`', sep: ' | ' },
+                before: (data) => callEqual(data, "ki0:`z1` | ki1:`z2` | ")
+            });
+
+        d__([0, 1].map(i =>
+            c__(i + 1)),
+            {
+                format: { input: 'k{name}:`z{value}`' },
+                before: (data) => callEqual(data, "ki0:`z1`ki1:`z2`")
+            });
+
+        d__([0, 1].map(i =>
+            c__(i + 1)),
+            {
+                format: { result: 'ff{name}:`kk{value}`' },
+                before: (data) => callEqual(data, "ff_:`kk[1,2]`")
+            });
+    });
+
+    test('test_clear_inputs', () => {
+        d__([0, 1].map(i =>
+            c__(i, { name: (index, _, __) => `u${index}` })),
+            { before: (_) => false });
+
+        d__([0, 1].map(i =>
+            c__(i)),
+            { before: (data) => callEqual(data, "i0:`0` | i1:`1` | _:`[0,1]`") });
+    });
+
+    test('test_add_inputs', () => {
+        d__([0, 1].map(i =>
+            c__(i)),
+            {
+                inputs: { u1: 2, k2: ['ab', 'cd'] },
+                before: (data) => callEqual(data, 'i0:`0` | i1:`1` | u1:`2` | k2:`["ab","cd"]` | _:`[0,1]`')
+            });
+    });
+
 });

@@ -1,3 +1,7 @@
+## v0.1.2 - 2024-10-14
+- Fix issues with format
+- Add examples
+
 ## v0.1.1 - 2024-10-13
 - Improve build
 - Add examples

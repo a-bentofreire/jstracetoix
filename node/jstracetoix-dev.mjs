@@ -129,9 +129,11 @@ export const d__ = (value, params = {}) => {
         "{value}",
         typeof _value === "object" ? JSON.stringify(_value) : _value
       );
-      for (const key in data) {
-        if (!data.meta__.includes(key)) {
-          output += replaceMacro(format.input, key, data[key]) + format.sep;
+      if (format.input) {
+        for (const key in data) {
+          if (!data.meta__.includes(key)) {
+            output += replaceMacro(format.input, key, data[key]) + (format.sep || "");
+          }
         }
       }
       if (format.result) {

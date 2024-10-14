@@ -154,7 +154,7 @@ export const t__ = (
  * [1, 2, 3, 4, 5].map(i => c__(i, { allow: (index, name, value) => index > 2 }));
  * [10, 20, 30].map(x => c__(x, { allow: (index, name, value) => value === 20 }));
  *
- * const z = d__(() => c__(outside_1) + y * c__(outside_2) + d__(() => k * c__(inside(5), 
+ * const z = d__(() => c__(outside_1) + y * c__(outside_2) + d__(() => k * c__(inside(5),
  *   { level: 1 })));
  */
 export const c__ = (
@@ -307,9 +307,11 @@ export const d__ = (
                 _format.replace('{name}', _name).replace('{value}',
                     typeof _value === 'object' ? JSON.stringify(_value) : _value);
 
-            for (const key in data) {
-                if (!data.meta__.includes(key)) {
-                    output += replaceMacro(format.input, key, data[key]) + format.sep;
+            if (format.input) {
+                for (const key in data) {
+                    if (!data.meta__.includes(key)) {
+                        output += replaceMacro(format.input, key, data[key]) + (format.sep || '');
+                    }
                 }
             }
 

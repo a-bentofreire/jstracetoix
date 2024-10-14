@@ -1,7 +1,7 @@
 {
     "name": "jstracetoix",
     "description": "An expression tracer for debugging arrow functions, method chaining and expressions",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "publisher": "a-bentofreire",
     "type": "module",
     "keywords": [
@@ -26,14 +26,14 @@
     "bugs": "https://github.com/a-bentofreire/jstracetoix/issues",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/a-bentofreire/jstracetoix"
+        "url": "git+https://github.com/a-bentofreire/jstracetoix.git"
     },
     "main": "./node/jstracetoix.mjs",
     "scripts": {
         "lint": "npx eslint . --ignore-pattern '**/*.*js'",
         "npm:publish": "npm publish",
         "npm:publish-dry-run": "npm publish --dry-run",
-        "prepublishOnly": "npm run lint && npm run build-node && npm run build-node-dev && npm run build-browser && npm run build-browser-dev && npm run test && npm run build-docs",
+        "prepublishOnly": "npm run lint --fix && npm run build-node && npm run build-node-dev && npm run build-browser && npm run build-browser-dev && npm run test && npm run build-docs",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js npx jest .",
         "build-node-dev": "node build.js",
         "build-node": "node build.js --production",

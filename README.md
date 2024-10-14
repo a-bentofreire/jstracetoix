@@ -51,7 +51,7 @@ npm install jstracetoix --save-dev
 <html lang="en">
 
 <head>
-    <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix/browser/jstracetoix.js?v=0.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix/browser/jstracetoix.js?v=0.1.2"></script>
     <script>
         d__(c__(5) + 1);
     </script>
