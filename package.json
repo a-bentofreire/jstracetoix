@@ -1,13 +1,14 @@
 {
     "name": "jstracetoix",
-    "description": "An expression tracer for debugging React components, arrow functions, method chaining and expressions",
-    "version": "0.1.3",
+    "description": "An expression tracer for debugging React or Vue components, arrow functions, method chaining and expressions",
+    "version": "0.1.5",
     "publisher": "a-bentofreire",
     "type": "module",
     "keywords": [
         "debugging",
         "logging",
         "react",
+        "vue",
         "log",
         "expression",
         "arrow functions",

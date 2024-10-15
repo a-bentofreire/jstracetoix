@@ -2,7 +2,7 @@
 // Copyright (c) 2024 Alexandre Bento Freire. All rights reserved.
 // Licensed under the MIT license
 // --------------------------------------------------------------------
-// Version: 0.1.3
+// Version: 0.1.5
 
 // externals.ts
 var _stream = console.debug;

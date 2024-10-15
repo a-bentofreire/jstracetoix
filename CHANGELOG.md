@@ -1,3 +1,11 @@
+## v0.1.5 - 2024-10-14
+- Fix cdn.jsdelivr.net links
+- Improve examples
+- Add Vue examples
+
+## v0.1.4 - 2024-10-14
+- Test tags
+
 ## v0.1.3 - 2024-10-14
 - Improve build
 - Refactor to externalize platform dependencies.
