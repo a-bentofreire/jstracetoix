@@ -128,7 +128,7 @@ The browser doesn't requires local installation.
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product List</title>
-  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@0.1.4/browser/jstracetoix.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.0.0/browser/jstracetoix.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     table { width: 50%; border-collapse: collapse; margin: 20px auto; }
@@ -151,7 +151,7 @@ The browser doesn't requires local installation.
   <script>
     const tax = (price) => price > 40 ? 0.15 : 0.10;
 
-    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix/examples/products.json')
+    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.0.0/examples/products.json')
       .then(function (response) {
         const products = response.data;
         const tableBody = document.querySelector('#productTable tbody');
@@ -171,6 +171,13 @@ The browser doesn't requires local installation.
 </html>
 ```
 
+## How to use JsTraceToIX on Vue
+
+- JsTraceToIX can be used to debug expressions within Vue components.
+- It requires to be installed locally URL.
+- This example is similar to the React example.
+
+```plaintext
 <template>
   <div class="App">
     <header class="App-header">
@@ -186,12 +193,6 @@ The browser doesn't requires local installation.
   </div>
 </template>
 
-## How to use JsTraceToIX on Vue
-
-- JsTraceToIX can be used to debug expressions within Vue components.
-- It requires to be installed locally URL.
-
-```javascript
 <script>
 import { c__, d__ } from 'jstracetoix/component/jstracetoix.mjs'
 
@@ -371,7 +372,7 @@ Formatting parameters:
 
 ## Multithreading
 
-To activate the multithreading support:
+To activate the multithreading support (Node.js only):
 
 ```javascript
 

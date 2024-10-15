@@ -54,8 +54,8 @@ async function build() {
         }
     }
 
-    for (const file of ['README.md', 'examples/example-browser.html', 'examples/example-react/App.js']) {
-        fs.writeFileSync(file, readFile('README.md').replace(/jstracetoix@\d{1,3}\.\d{1,3}\.\d{1,3}\//, `jstracetoix@${version}/`));
+    for (const file of ['README.md', 'examples/example-browser.html', 'examples/example-react/src/App.js']) {
+        fs.writeFileSync(file, readFile(file).replace(/jstracetoix@\d{1,3}\.\d{1,3}\.\d{1,3}\//g, `jstracetoix@${version}/`));
     }
     if (readFile('CHANGELOG.md').split("\n")[0].indexOf(version) === -1) {
         throw new Error(`CHANGELOG.md doesn't ${version}`)
