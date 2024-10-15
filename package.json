@@ -1,7 +1,7 @@
 {
     "name": "jstracetoix",
     "description": "An expression tracer for debugging React or Vue components, arrow functions, method chaining and expressions",
-    "version": "0.1.5",
+    "version": "1.0.0",
     "publisher": "a-bentofreire",
     "type": "module",
     "keywords": [

@@ -1,3 +1,6 @@
+## v1.0.0 - 2024-10-15
+- Improve README
+
 ## v0.1.5 - 2024-10-14
 - Fix cdn.jsdelivr.net links
 - Improve examples
