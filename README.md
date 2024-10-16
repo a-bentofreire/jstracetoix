@@ -5,7 +5,7 @@
 
 [JsTraceToIX](https://www.devtoix.com/en/projects/jstracetoix) is an expression tracer for debugging React or Vue components, arrow functions, method chaining, and expressions in general.
 
-Code editors cannot set breakpoints within expressions, including React or Vue components, arrow functions, and chained methods, often requiring significant code changes to debug this type of code.
+Code editors typically cannot set breakpoints within such expressions, requiring significant code changes to debug. 
 
 JsTraceToIX provides a straightforward solution to this problem.
 
@@ -42,20 +42,20 @@ This package is also available in Python for similar debugging purposes. The Pyt
 
 It offers the same `c__` and `d__` tracing functionality for Python, providing a seamless debugging experience across both languages.
 
-## How to install JsTraceToIX on Node.js or React or Vue
+## Installation
+
+| Environment | Require Installation |
+| ----- | ------------------- |
+| Browser | No  |
+| Node.js | Yes |
+| React | Optional |
+| Vue | Yes |
 
 ```bash
 npm install jstracetoix --save-dev
 ```
 
-NOTE: For React, it can also be used without local installation.
-
-## How to use JsTraceToIX on React
-
-- JsTraceToIX can be used to debug expressions within React components.
-- It can be installed locally or imported via URL.
-- The output is displayed in the browser's developer tools under the Console Tab.
-- Since the output is generated using `console.debug`, it can easily be filtered out from regular `console.log` messages.
+## React Usage
 
 In this example:
 - `cityTax` arrow function captures the input price and names it 'Price'.
@@ -75,7 +75,7 @@ i0:`Shoes` | Price:`100` | CityTax:`15` | _:`115`
 ```javascript
 import './App.css';
 // Without local installation
-import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.0.0/component/jstracetoix.mjs';
+import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.1.0/component/jstracetoix.mjs';
 
 // If it's installed locally via "npm install jstracetoix --save-dev"
 // import { c__, d__ } from 'jstracetoix/component/jstracetoix.mjs';
@@ -113,10 +113,9 @@ function App() {
 export default App;
 ```
 
-## How to use JsTraceToIX in a browser
+## Browser Usage
 
-The browser doesn't requires local installation.
-- This example is similar to the React example, but instead the information is collected from a remote JSON.
+This example is similar to the React example, but instead the products are collected from a remote JSON.
 - `c__` captures the price and the tax, and names `tax` the 2nd input.
 - `d__` displays the aggregate information if `tax` is 0.15.
 
@@ -128,7 +127,7 @@ The browser doesn't requires local installation.
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product List</title>
-  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.0.0/browser/jstracetoix.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.1.0/browser/jstracetoix.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     table { width: 50%; border-collapse: collapse; margin: 20px auto; }
@@ -151,7 +150,7 @@ The browser doesn't requires local installation.
   <script>
     const tax = (price) => price > 40 ? 0.15 : 0.10;
 
-    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.0.0/examples/products.json')
+    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.1.0/examples/products.json')
       .then(function (response) {
         const products = response.data;
         const tableBody = document.querySelector('#productTable tbody');
@@ -171,13 +170,11 @@ The browser doesn't requires local installation.
 </html>
 ```
 
-## How to use JsTraceToIX on Vue
+## Vue Usage
 
-- JsTraceToIX can be used to debug expressions within Vue components.
-- It requires to be installed locally URL.
 - This example is similar to the React example.
 
-```plaintext
+```html
 <template>
   <div class="App">
     <header class="App-header">
@@ -230,7 +227,44 @@ export default {
 </style>
 ```
 
-## Usage
+## Node.js Usage
+
+In this example:
+- `c__`.`allow()` - overrides the input value being debugged when value > 40.00,  
+  for other values it doesn't captures the input.
+- `d__`.`allow()` - overrides the result value being debugged.
+- `d__`.`after()` - stops the program after displaying the result and the captured fields.
+
+```javascript
+import { c__, d__ } from 'jstracetoix';
+
+const products = [
+    { "name": "Smartphone 128GB", "price": 699.00 },
+    { "name": "Coffee Maker", "price": 49.99 },
+    { "name": "Electric Toothbrush", "price": 39.95 },
+    { "name": "4K Ultra HD TV", "price": 999.99 },
+    { "name": "Gaming Laptop", "price": 1299.00 }];
+
+const factor = (price) => price < 1000 ? 1.10 : 1;
+
+const prices = d__(products.map(product => c__(product.price,
+    {
+        allow: (index, name, value) => value > 40.00 ?
+            Math.floor(value * factor(value)) : false,
+        name: product.name.substring(0, 10)
+    })), {
+    allow: (data) => data._.map((v, i) => `${i}:${v}`),
+    after: (data) => process.exit() // exits after displaying the results
+});
+// Smartphone:`768` | Coffee Mak:`54` | 4K Ultra H:`1099` | Gaming Lap:`1299` | _:`["0:699","1:49.99","2:39.95","3:999.99","4:1299"]`
+
+// this code is unreachable
+for (const price in prices) {
+    let value = price;
+}
+```
+
+## Detailed Usage and Examples
 
 ```javascript
 import { c__, d__, init__, t__ } from 'jstracetoix';
@@ -423,9 +457,22 @@ if (isMainThread) {
 }
 ```
 
+## Output
+
+| Environment | Default Output Function |
+| ----- | ------------------- |
+| Browser | console.debug  |
+| Node.js | process.stdout |
+| React | console.debug |
+| Vue | console.debug |
+
+Except for Node.js environment, the output is displayed in the browser's developer tools under the "Console Tab".
+Since the output is generated using `console.debug`, it can easily be filtered out from regular `console.log` messages.  
+The default output function can be override using `init__({'stream': new_stream.log })`
+
 ## Metadata
 
- The `allow`, `before` and `after` will receive a parameter `data` with the allowed inputs plus the following `meta` items:
+ The `d__` function callbacks `allow`, `before` and `after` will receive a parameter `data` with the allowed inputs plus the following `meta` items:
 
 - `meta__`: list of meta keys including the name key.
 - `thread_id__`: thread_id being executed

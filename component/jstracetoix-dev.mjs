@@ -2,7 +2,7 @@
 // Copyright (c) 2024 Alexandre Bento Freire. All rights reserved.
 // Licensed under the MIT license
 // --------------------------------------------------------------------
-// Version: 1.0.0
+// Version: 1.1.0
 
 // externals.ts
 var _stream = console.debug;
@@ -32,10 +32,12 @@ var DEFAULT_FORMAT = {
 var _format = DEFAULT_FORMAT;
 var _inputsPerThreads = {};
 var _threadNames = {};
+var _enabled = true;
 var init__ = ({
   stream = void 0,
   multithreading = false,
-  format = DEFAULT_FORMAT
+  format = DEFAULT_FORMAT,
+  enabled = true
 } = {}) => {
   acquireLock();
   setStream(stream);
@@ -43,14 +45,20 @@ var init__ = ({
   _format = format;
   _inputsPerThreads = {};
   _threadNames = {};
+  _enabled = enabled;
   releaseLock();
 };
 var t__ = (name = void 0, threadIdParam = void 0) => {
-  acquireLock();
-  _threadNames[getThreadId(threadIdParam)] = name || `t${Object.keys(_threadNames).length}`;
-  releaseLock();
+  if (_enabled) {
+    acquireLock();
+    _threadNames[getThreadId(threadIdParam)] = name || `t${Object.keys(_threadNames).length}`;
+    releaseLock();
+  }
 };
 var c__ = (value, params) => {
+  if (!_enabled) {
+    return value;
+  }
   const { name = void 0, allow = void 0, level = 0 } = params || {};
   acquireLock();
   const _threadId = getThreadId();
@@ -84,6 +92,9 @@ var c__ = (value, params) => {
   return value;
 };
 var d__ = (value, params = {}) => {
+  if (!_enabled) {
+    return value;
+  }
   let {
     name = "_",
     allow = void 0,

@@ -11,7 +11,6 @@ import {
 /**
  * Format Type -- Defines how result and input values will be formatted.
  *
- * @typedef {Object} Format
  * @property {string} result - The format of the result value to be displayed.
  *          Defaults to `'{name}: `{value}`'`.
  * @property {string} input - The format of the input value to be displayed.
@@ -22,7 +21,7 @@ import {
  *          Defaults to `' | '`.
  * @property {boolean} new_line - If `true`, it will add a new line at the end of the output.
  */
-export type Format = {
+export interface Format {
     result: string,
     input: string,
     thread: string,
@@ -49,6 +48,7 @@ export const DEFAULT_FORMAT: Format = {
 let _format: Format = DEFAULT_FORMAT;
 let _inputsPerThreads: Record<number, Record<string, any>[]> = {};
 let _threadNames: Record<number, string> = {};
+let _enabled: boolean = true;
 
 /**
  * Initializes global settings of the tracing tool.
@@ -56,20 +56,24 @@ let _threadNames: Record<number, string> = {};
  * @param {Object} params - Parameters for initialization.
  * @param {NodeBrowserStream} [params.stream=process.stdout] - The output stream to write
  *       the output lines.
- *       Default "process.stdout" for node or component and "console.debug" for browser.
+ *       Default `process.stdout` for node or component and `console.debug` for browser.
  * @param {boolean} [params.multithreading=false] - If `true`, it prefixes the output with
  *       `thread_id:`.
  * @param {Format} [params.format=DEFAULT_FORMAT] - Format object defining the output format.
+ *       Defaults to `DEFAULT_FORMAT`.
+ * @param {boolean} [params.enabled=true] - If false, it disables `t__`, `c__` and `d__`.
  *       Defaults to `DEFAULT_FORMAT`.
  */
 export const init__ = ({
     stream = undefined,
     multithreading = false,
-    format = DEFAULT_FORMAT
+    format = DEFAULT_FORMAT,
+    enabled = true,
 }: {
     stream?: NodeBrowserStream,
     multithreading?: boolean,
-    format?: Format
+    format?: Format,
+    enabled?: boolean,
 } = {}): void => {
 
     acquireLock();
@@ -78,6 +82,7 @@ export const init__ = ({
     _format = format;
     _inputsPerThreads = {};
     _threadNames = {};
+    _enabled = enabled;
     releaseLock();
 };
 
@@ -96,10 +101,11 @@ export const t__ = (
     name: string | undefined = undefined,
     threadIdParam: number | undefined = undefined
 ): void => {
-
-    acquireLock();
-    _threadNames[getThreadId(threadIdParam)] = name || `t${Object.keys(_threadNames).length}`;
-    releaseLock();
+    if (_enabled) {
+        acquireLock();
+        _threadNames[getThreadId(threadIdParam)] = name || `t${Object.keys(_threadNames).length}`;
+        releaseLock();
+    }
 };
 
 /**
@@ -142,6 +148,9 @@ export const c__ = (
         level?: number;
     }
 ): any => {
+    if (!_enabled) {
+        return value;
+    }
     const { name = undefined, allow = undefined, level = 0 } = params || {};
     acquireLock();
     const _threadId = getThreadId();
@@ -238,6 +247,9 @@ export const d__ = (
         format?: Format
     } = {}
 ): any => {
+    if (!_enabled) {
+        return value;
+    }
 
     let {
         name = '_',
