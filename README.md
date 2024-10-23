@@ -5,7 +5,7 @@
 
 [JsTraceToIX](https://www.devtoix.com/en/projects/jstracetoix) is an expression tracer for debugging React or Vue components, arrow functions, method chaining, and expressions in general.
 
-Code editors typically cannot set breakpoints within such expressions, requiring significant code changes to debug. 
+Code editors typically cannot set breakpoints within such expressions, requiring significant code changes to debug.
 
 JsTraceToIX provides a straightforward solution to this problem.
 
@@ -16,7 +16,7 @@ JsTraceToIX has 2 major functions:
 - `d__` display the result of an expression and all the captured inputs. ex: `d__(c__(x) + c__(y))`
 
 And 2 optional functions:
-- `init__` initializes display format, output stream and multithreading.
+- `init__` initializes display format, output stream, multithreading, enable/disable processing `c__`, `d__` and `t__`.
 - `t__` defines a name for the current thread.
 
 If you find this project useful, please, read the [Support this Project](https://www.devtoix.com/en/projects/jstracetoix#support-this-project) on how to contribute.
@@ -24,7 +24,7 @@ If you find this project useful, please, read the [Support this Project](https:/
 ## Features
 
 - No external dependencies.
-- Runs on Node.js, browsers, React components, and Vue components.
+- Runs on Node.js (es6 module and commonjs), browsers, React components, and Vue components.
 - Minimalist function names that are simple and short.
 - Traces Results along with Inputs.
 - Configurable Result and Input naming.
@@ -32,6 +32,7 @@ If you find this project useful, please, read the [Support this Project](https:/
 - Supports multiple levels.
 - Capture Input method with customizable `allow` and `name` callbacks.
 - Display Result method with customizable `allow`, `before`, and `after` callbacks.
+- Support to globally disable the processing `c__`, `d__`, `t__`.
 - Result and Inputs can be reformatted and overridden.
 - Configurable [formatting](https://www.devtoix.com/en/projects/jstracetoix#formatting) at both global and function levels.
 - Supports [Multithreading](https://www.devtoix.com/en/projects/jstracetoix#multithreading).
@@ -75,10 +76,10 @@ i0:`Shoes` | Price:`100` | CityTax:`15` | _:`115`
 ```javascript
 import './App.css';
 // Without local installation
-import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.1.0/component/jstracetoix.mjs';
+import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/component/jstracetoix.mjs';
 
 // If it's installed locally via "npm install jstracetoix --save-dev"
-// import { c__, d__ } from 'jstracetoix/component/jstracetoix.mjs';
+// import { c__, d__ } from 'jstracetoix/component';
 
 const cityTax = (price) => c__(price, {name: 'Price'}) > 20 ? 15 : 5;
 const products = [
@@ -127,7 +128,7 @@ This example is similar to the React example, but instead the products are colle
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product List</title>
-  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.1.0/browser/jstracetoix.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/browser/jstracetoix.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     table { width: 50%; border-collapse: collapse; margin: 20px auto; }
@@ -150,7 +151,7 @@ This example is similar to the React example, but instead the products are colle
   <script>
     const tax = (price) => price > 40 ? 0.15 : 0.10;
 
-    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.1.0/examples/products.json')
+    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/examples/products.json')
       .then(function (response) {
         const products = response.data;
         const tableBody = document.querySelector('#productTable tbody');
@@ -191,7 +192,7 @@ This example is similar to the React example, but instead the products are colle
 </template>
 
 <script>
-import { c__, d__ } from 'jstracetoix/component/jstracetoix.mjs'
+import { c__, d__ } from 'jstracetoix/component'
 
 export default {
   name: 'App',
@@ -229,6 +230,11 @@ export default {
 
 ## Node.js Usage
 
+| Format | Usage |
+|-|-|
+| es6 module | `import { c__, d__ } from 'jstracetoix'` |
+| commonjs | `const { c__, d__ } = require('jstracetoix');` |
+
 In this example:
 - `c__`.`allow()` - overrides the input value being debugged when value > 40.00,  
   for other values it doesn't captures the input.
@@ -236,7 +242,10 @@ In this example:
 - `d__`.`after()` - stops the program after displaying the result and the captured fields.
 
 ```javascript
+// from a es6 module
 import { c__, d__ } from 'jstracetoix';
+// from a "commonjs" file
+// const { c__, d__ } = require('jstracetoix');
 
 const products = [
     { "name": "Smartphone 128GB", "price": 699.00 },
@@ -478,7 +487,7 @@ The default output function can be override using `init__({'stream': new_stream.
 - `thread_id__`: thread_id being executed
 - `allow_input_count__`: total number of inputs that are allowed.
 - `input_count__`: total number of inputs being captured.
-- `allow__`: If false it was allowed. Use this for `after` callback.
+- `allow__`: If false it wasn't allowed. Use this for `after` callback.
 - `output__`: Text passed to `before` without `new_line`.
 - name: name parameter
 

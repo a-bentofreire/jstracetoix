@@ -1,3 +1,8 @@
+## v1.2.0 - 2024-10-23
+- Improve README
+- Add commonjs support
+- Improve component support calling
+
 ## v1.1.0 - 2024-10-16
 - Improve README
 - Add `init({enabled: false})`

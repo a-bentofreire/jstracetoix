@@ -1,5 +1,8 @@
 import './App.css';
-import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.1.0/component/jstracetoix.mjs';
+import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/component/jstracetoix.mjs';
+// if it's installed locally
+// import { c__, d__ } from 'jstracetoix/component';
+
 
 const cityTax = (price) => c__(price, {name: 'Price'}) > 20 ? 15 : 5;
 const products = [

@@ -2,7 +2,7 @@
 // Copyright (c) 2024 Alexandre Bento Freire. All rights reserved.
 // Licensed under the MIT license
 // --------------------------------------------------------------------
-// Version: 1.1.0
+// Version: 1.2.0
 "use strict";
 var jstracetoix = (() => {
   var __defProp = Object.defineProperty;

@@ -61,8 +61,8 @@ let _enabled: boolean = true;
  *       `thread_id:`.
  * @param {Format} [params.format=DEFAULT_FORMAT] - Format object defining the output format.
  *       Defaults to `DEFAULT_FORMAT`.
- * @param {boolean} [params.enabled=true] - If false, it disables `t__`, `c__` and `d__`.
- *       Defaults to `DEFAULT_FORMAT`.
+ * @param {boolean} [params.enabled=true] - If `false`, it disables processing
+ *        `t__`, `c__` and `d__`. Defaults to `true`.
  */
 export const init__ = ({
     stream = undefined,
@@ -94,7 +94,7 @@ export const init__ = ({
  * If no threadIdParam is provided, it uses the current thread ID.
  *
  * @param {string} [name] - The name for the thread.
- *       Defaults to 't%d' where %d is the number of threads.
+ *       Defaults to `t%d` where %d is the number of threads.
  * @param {number} [threadIdParam] - The ID of the thread. Defaults to the current thread ID.
  */
 export const t__ = (
@@ -117,14 +117,14 @@ export const t__ = (
  * @param {Object} params Optional parameters object
  * @param {string | ((index: number, allowIndex: number, value: any) => string) } params.name The
  *       name of the input.
- *       Defaults to 'i%d' where %d is the number of inputs for the thread.
+ *       Defaults to `i%d` where %d is the number of inputs for the thread.
  * @param {boolean | ((index: number, name: string, value: any) => AllowResult} params.allow A
  *       function or value to allow tracing the input. **allow** is called before **name**.
- *       If it returns True or False, it will allow or disallow respectively.
- *       If it returns not bool, then it will display the allow result instead of the input value.
+ *       If it returns a boolean, it will allow or disallow respectively.
+ *       Otherwise it will display the allow result instead of the input value.
  * @param {number} params.level The level number to be used when there is more than one **d__**
  *       within the same expression or function.
- *       Defaults to 0.
+ *       Defaults to `0`.
  *
  * @returns The input value
  *

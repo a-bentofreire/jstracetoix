@@ -3,9 +3,38 @@
 // Licensed under the MIT license
 // --------------------------------------------------------------------
 // Version: 1.2.0
+"use strict";
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// jstracetoix.ts
+var jstracetoix_exports = {};
+__export(jstracetoix_exports, {
+  DEFAULT_FORMAT: () => DEFAULT_FORMAT,
+  c__: () => c__,
+  d__: () => d__,
+  init__: () => init__,
+  t__: () => t__
+});
+module.exports = __toCommonJS(jstracetoix_exports);
 
 // externals.ts
-import { threadId } from "worker_threads";
+var import_worker_threads = require("worker_threads");
 var _sharedLockBuffer = new SharedArrayBuffer(4);
 var _lockArray = new Int32Array(_sharedLockBuffer);
 var _multithreading = false;
@@ -20,7 +49,7 @@ var setStream = (stream) => {
 var writeToStream = (output) => {
   _stream.write(output);
 };
-var getThreadId = (threadIdParam = void 0) => threadIdParam || threadId;
+var getThreadId = (threadIdParam = void 0) => threadIdParam || import_worker_threads.threadId;
 var acquireLock = () => {
   while (_multithreading && Atomics.compareExchange(_lockArray, 0, 0, 1) !== 0) {
   }
@@ -180,10 +209,11 @@ var d__ = (value, params = {}) => {
   }
   return value;
 };
-export {
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
   DEFAULT_FORMAT,
   c__,
   d__,
   init__,
   t__
-};
+});
