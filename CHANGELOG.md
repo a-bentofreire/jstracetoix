@@ -1,3 +1,6 @@
+## v1.2.1 - 2024-10-23
+- Fix package.json
+
 ## v1.2.0 - 2024-10-23
 - Improve README
 - Add commonjs support

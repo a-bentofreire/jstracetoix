@@ -76,7 +76,7 @@ i0:`Shoes` | Price:`100` | CityTax:`15` | _:`115`
 ```javascript
 import './App.css';
 // Without local installation
-import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/component/jstracetoix.mjs';
+import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.1/component/jstracetoix.mjs';
 
 // If it's installed locally via "npm install jstracetoix --save-dev"
 // import { c__, d__ } from 'jstracetoix/component';
@@ -128,7 +128,7 @@ This example is similar to the React example, but instead the products are colle
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product List</title>
-  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/browser/jstracetoix.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.1/browser/jstracetoix.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     table { width: 50%; border-collapse: collapse; margin: 20px auto; }
@@ -151,7 +151,7 @@ This example is similar to the React example, but instead the products are colle
   <script>
     const tax = (price) => price > 40 ? 0.15 : 0.10;
 
-    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/examples/products.json')
+    axios.get('https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.1/examples/products.json')
       .then(function (response) {
         const products = response.data;
         const tableBody = document.querySelector('#productTable tbody');

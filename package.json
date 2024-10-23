@@ -1,7 +1,7 @@
 {
     "name": "jstracetoix",
     "description": "An expression tracer for debugging React or Vue components, arrow functions, method chaining and expressions",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "publisher": "a-bentofreire",
     "type": "module",
     "keywords": [
@@ -32,6 +32,15 @@
         "url": "git+https://github.com/a-bentofreire/jstracetoix.git"
     },
     "main": "./node/jstracetoix.mjs",
+    "exports": {
+        ".": {
+            "import": "./node/jstracetoix.mjs",
+            "require": "./commonjs/jstracetoix.cjs"
+        },
+        "./component": {
+            "import": "./component/jstracetoix.mjs"
+        }
+    },
     "scripts": {
         "lint": "npx eslint . --ignore-pattern '**/*.*js'",
         "npm:publish": "npm publish",

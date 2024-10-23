@@ -1,5 +1,5 @@
 import './App.css';
-import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.0/component/jstracetoix.mjs';
+import { c__, d__ } from 'https://cdn.jsdelivr.net/gh/a-bentofreire/jstracetoix@1.2.1/component/jstracetoix.mjs';
 // if it's installed locally
 // import { c__, d__ } from 'jstracetoix/component';
 
